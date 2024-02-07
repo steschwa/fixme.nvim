@@ -7,7 +7,17 @@
 --- @field text string
 --- @field hl string?
 
---- @alias FixmeComponentProvider fun(item: QFItem): FixmeComponent
+--- @alias FixmeComponentProvider fun(item: FixmeQFItem): FixmeComponent
+
+--- @class FixmeQFItem
+--- @field line_start number
+--- @field line_end number
+--- @field col_start number
+--- @field col_end number
+--- @field type string
+--- @field text string
+--- @field filepath string
+--- @field bufnr number
 
 --- @class QFFormatParams
 --- @field id number

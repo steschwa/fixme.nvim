@@ -1,8 +1,8 @@
 local line_builder = require("fixme.line_builder")
+local converter = require("fixme.converter")
 
 --- @class FixmeImpl
 --- @field providers FixmeComponentProvider[]
---- @field stretch boolean
 local M = {}
 
 --- @param params QFFormatParams
@@ -15,9 +15,11 @@ function M.format(params)
         qfbufnr = true,
     })
 
+    local items = converter.convert_items(result.items)
+
     --- @type LineBuilder[]
     local builders = {}
-    for _, item in ipairs(result.items) do
+    for _, item in ipairs(items) do
         local builder = line_builder:new(result.qfbufnr)
 
         for _, component in ipairs(M.providers) do
@@ -70,5 +72,3 @@ function M.setup(opts)
 end
 
 return M
-
--- yarn --silent --cwd packages/web-app eslint --fix --format unix src
