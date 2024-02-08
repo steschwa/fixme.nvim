@@ -1,6 +1,8 @@
 local line_builder = require("fixme.line_builder")
 local converter = require("fixme.converter")
 
+local line_hl_ns = vim.api.nvim_create_namespace("fixme_qf")
+
 --- @class FixmeImpl
 --- @field providers FixmeComponentProvider[]
 local M = {}
@@ -14,6 +16,8 @@ function M.format(params)
         items = true,
         qfbufnr = true,
     })
+
+    vim.api.nvim_buf_clear_namespace(result.qfbufnr, line_hl_ns, 0, -1)
 
     local items = converter.convert_items(result.items)
 
@@ -37,7 +41,7 @@ function M.format(params)
 
     vim.schedule(function()
         for i, builder in ipairs(builders) do
-            builder:apply_highlights(i - 1)
+            builder:apply_highlights(i - 1, line_hl_ns)
         end
     end)
 

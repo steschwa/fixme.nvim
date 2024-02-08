@@ -1,5 +1,3 @@
-local ns = vim.api.nvim_create_namespace("fixme_qf")
-
 --- @class LineBuilder
 --- @field buf_id number
 --- @field components FixmeComponent[]
@@ -37,7 +35,8 @@ function LineBuilder:to_string()
 end
 
 --- @param line_index number
-function LineBuilder:apply_highlights(line_index)
+--- @param ns number
+function LineBuilder:apply_highlights(line_index, ns)
     local col = 0
 
     for _, component in ipairs(self.components) do
