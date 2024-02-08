@@ -40,9 +40,9 @@ function LineBuilder:apply_highlights(line_index, ns)
     local col = 0
 
     for _, component in ipairs(self.components) do
-        if component.hl ~= nil then
-            local next_col = col + #component.text
+        local next_col = col + #component.text
 
+        if component.hl ~= nil then
             vim.highlight.range(
                 self.buf_id,
                 ns,
@@ -50,9 +50,8 @@ function LineBuilder:apply_highlights(line_index, ns)
                 { line_index, col },
                 { line_index, next_col }
             )
-
-            col = next_col
         end
+        col = next_col
     end
 end
 
