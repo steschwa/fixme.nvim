@@ -36,8 +36,8 @@ function M.format(params)
         table.insert(line_builders, line_builder)
     end
 
-    if M.config.hooks.layout ~= nil then
-        M.config.hooks.layout(line_builders)
+    for _, hook in ipairs(M.config.hooks) do
+        hook(line_builders)
     end
 
     --- @type string[]
