@@ -1,3 +1,5 @@
+local Logger = require("fixme.utils.logging")
+
 --- @class Config
 --- @field providers FixmeComponentProvider[]
 --- @field column_separator string
@@ -28,37 +30,34 @@ end
 
 function Config:validate()
     if type(self.providers) ~= "table" then
-        vim.notify(
-            "'providers' must be a table, but got " .. type(self.providers),
-            vim.log.levels.ERROR
-        )
+        Logger.error("'providers' must be a table, but got " .. type(self.providers))
         return
     end
     if #self.providers == 0 then
-        vim.notify(
-            "no 'providers' given. this plugin does not work with zero-config",
-            vim.log.levels.WARN
-        )
-        return
-    end
-    if type(self.column_separator) ~= "string" then
-        vim.notify(
-            "'column_separator' must be a string, but got " .. type(self.column_separator),
-            vim.log.levels.ERROR
-        )
-        return
-    end
-    if type(self.hooks) ~= "table" then
-        vim.notify("'hooks' must be a table, but got " .. type(self.hooks), vim.log.levels.ERROR)
+        Logger.warn("no 'providers' given. this plugin does not work with zero-config")
         return
     end
 
-    if self.hooks.layout ~= nil and type(self.hooks.layout) ~= "function" then
-        vim.notify(
-            "'hooks.layout' must be a function, but got" .. type(self.hooks.layout),
-            vim.log.levels.ERROR
-        )
+    if type(self.column_separator) ~= "string" then
+        Logger.error("'column_separator' must be a string, but got " .. type(self.column_separator))
         return
+    end
+
+    if type(self.hooks) ~= "table" then
+        Logger.error("'hooks' must be a table, but got " .. type(self.hooks))
+        return
+    end
+    if self.hooks.layout ~= nil and type(self.hooks.layout) ~= "table" then
+        Logger.error("'hooks.layout' must be a table, but got " .. type(self.hooks.layout))
+        return
+    end
+    for i, hook in ipairs(self.hooks.layout) do
+        if type(hook) ~= "function" then
+            Logger.error(
+                string.format("'hooks.layout.[%d]' must be a function, but got %s", i, type(hook))
+            )
+            return
+        end
     end
 end
 
