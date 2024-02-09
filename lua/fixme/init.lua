@@ -1,6 +1,6 @@
-local line_builder = require("fixme.line_builder")
-local converter = require("fixme.converter")
-local config = require("fixme.config")
+local Builder = require("fixme.builder")
+local Converter = require("fixme.converter")
+local Config = require("fixme.config")
 
 local line_hl_ns = vim.api.nvim_create_namespace("fixme_qf")
 
@@ -20,32 +20,20 @@ function M.format(params)
 
     vim.api.nvim_buf_clear_namespace(result.qfbufnr, line_hl_ns, 0, -1)
 
-    local items = converter.convert_items(result.items)
+    local items = Converter.convert_items(result.items)
 
-    --- @type LineBuilder[]
-    local builders = {}
-    for _, item in ipairs(items) do
-        local builder = line_builder:new({
-            buf_id = result.qfbufnr,
-            separator = M.config.column_separator,
-        })
-
-        for _, component in ipairs(M.config.providers) do
-            builder:add(component(item))
-        end
-
-        table.insert(builders, builder)
-    end
+    local b = Builder:new(M.config, items)
+    local line_builders = b:get_line_builders()
 
     --- @type string[]
     local lines = {}
-    for _, builder in ipairs(builders) do
-        table.insert(lines, builder:to_string())
+    for _, line_builder in ipairs(line_builders) do
+        table.insert(lines, line_builder:to_string())
     end
 
     vim.schedule(function()
-        for i, builder in ipairs(builders) do
-            builder:apply_highlights(i - 1, line_hl_ns)
+        for i, line_builder in ipairs(line_builders) do
+            line_builder:apply_highlights(result.qfbufnr, i - 1, line_hl_ns)
         end
     end)
 
@@ -54,10 +42,10 @@ end
 
 --- @param params CreateConfigParams
 function M.setup(params)
-    local c = config:create(params)
-    c:validate()
+    local config = Config:create(params)
+    config:validate()
 
-    M.config = c
+    M.config = config
 
     vim.o.quickfixtextfunc = "v:lua.require'fixme'.format"
 
