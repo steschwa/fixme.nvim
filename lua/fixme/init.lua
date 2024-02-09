@@ -1,4 +1,4 @@
-local Builder = require("fixme.builder")
+local LineBuilder = require("fixme.line_builder")
 local Converter = require("fixme.converter")
 local Config = require("fixme.config")
 
@@ -22,8 +22,23 @@ function M.format(params)
 
     local items = Converter.convert_items(result.items)
 
-    local b = Builder:new(M.config, items)
-    local line_builders = b:get_line_builders()
+    --- @type LineBuilder[]
+    local line_builders = {}
+    for _, item in ipairs(items) do
+        local line_builder = LineBuilder:new({
+            column_separator = M.config.column_separator,
+        })
+
+        for _, provider in ipairs(M.config.providers) do
+            line_builder:add(provider(item))
+        end
+
+        table.insert(line_builders, line_builder)
+    end
+
+    if M.config.hooks.layout ~= nil then
+        M.config.hooks.layout(line_builders)
+    end
 
     --- @type string[]
     local lines = {}

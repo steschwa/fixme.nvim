@@ -39,7 +39,7 @@ function LineBuilder:to_string()
 end
 
 --- @param buf_id number
---- @param line_index number
+--- @param line_index number zero based line index
 --- @param ns number
 function LineBuilder:apply_highlights(buf_id, line_index, ns)
     local col = 0

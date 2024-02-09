@@ -19,6 +19,9 @@
 --- @field filepath string
 --- @field bufnr number
 
+--- @class FixmeHooks
+--- @field layout? fun(line_builders: LineBuilder[])
+
 --- @class QFFormatParams
 --- @field id number
 
