@@ -58,7 +58,6 @@ end
 --- @param params CreateConfigParams
 function M.setup(params)
     local config = Config:create(params)
-    config:validate()
 
     M.config = config
 
