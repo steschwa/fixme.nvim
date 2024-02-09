@@ -1,10 +1,11 @@
 local line_builder = require("fixme.line_builder")
 local converter = require("fixme.converter")
+local config = require("fixme.config")
 
 local line_hl_ns = vim.api.nvim_create_namespace("fixme_qf")
 
 --- @class FixmeImpl
---- @field providers FixmeComponentProvider[]
+--- @field config Config
 local M = {}
 
 --- @param params QFFormatParams
@@ -24,9 +25,12 @@ function M.format(params)
     --- @type LineBuilder[]
     local builders = {}
     for _, item in ipairs(items) do
-        local builder = line_builder:new(result.qfbufnr)
+        local builder = line_builder:new({
+            buf_id = result.qfbufnr,
+            separator = M.config.column_separator,
+        })
 
-        for _, component in ipairs(M.providers) do
+        for _, component in ipairs(M.config.providers) do
             builder:add(component(item))
         end
 
@@ -48,21 +52,12 @@ function M.format(params)
     return lines
 end
 
---- @param opts FixmeOptions
-function M.setup(opts)
-    opts = vim.tbl_deep_extend("force", {
-        providers = {},
-    }, opts or {})
+--- @param params CreateConfigParams
+function M.setup(params)
+    local c = config:create(params)
+    c:validate()
 
-    if #opts.providers == 0 then
-        vim.notify_once(
-            "you didn't pass any components to fixme.setup(). this plugin has no effect without components",
-            vim.log.levels.WARN
-        )
-        return
-    end
-
-    M.providers = opts.providers
+    M.config = c
 
     vim.o.quickfixtextfunc = "v:lua.require'fixme'.format"
 

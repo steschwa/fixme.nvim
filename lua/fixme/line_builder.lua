@@ -1,14 +1,20 @@
 --- @class LineBuilder
 --- @field buf_id number
+--- @field separator string
 --- @field components FixmeComponent[]
 local LineBuilder = {}
 
---- @param buf_id number
+--- @class NewLineBuilderParams
+--- @field buf_id number
+--- @field separator? string
+
+--- @param params NewLineBuilderParams
 --- @return LineBuilder
-function LineBuilder:new(buf_id)
+function LineBuilder:new(params)
     --- @type LineBuilder
     local this = {
-        buf_id = buf_id,
+        buf_id = params.buf_id,
+        separator = params.separator or "",
         components = {},
     }
     setmetatable(this, self)
@@ -26,12 +32,13 @@ end
 
 --- @return string
 function LineBuilder:to_string()
-    local str = ""
+    --- @type string[]
+    local texts = {}
     for _, components in ipairs(self.components) do
-        str = str .. components.text
+        table.insert(texts, components.text)
     end
 
-    return str
+    return vim.fn.join(texts, self.separator)
 end
 
 --- @param line_index number
@@ -51,7 +58,7 @@ function LineBuilder:apply_highlights(line_index, ns)
                 { line_index, next_col }
             )
         end
-        col = next_col
+        col = next_col + #self.separator
     end
 end
 
