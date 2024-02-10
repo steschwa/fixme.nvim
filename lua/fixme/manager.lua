@@ -25,6 +25,11 @@ end
 --- @return boolean
 function Manager:init_providers(qf_id)
     for _, selector in ipairs(self.config.selectors) do
+        if selector.use == nil then
+            self.providers = selector.providers
+            return true
+        end
+
         local ok, should_use = pcall(selector.use, qf_id)
         if ok and should_use then
             self.providers = selector.providers

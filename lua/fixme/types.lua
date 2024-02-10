@@ -1,7 +1,7 @@
 --- @meta
 
 --- @class FixmeSelector
---- @field use fun(qf_id: number): boolean
+--- @field use? fun(qf_id: number): boolean
 --- @field providers FixmeComponentProvider[]
 
 --- @class FixmeComponent
