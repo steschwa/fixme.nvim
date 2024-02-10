@@ -38,6 +38,33 @@ function LineBuilder:to_string()
     return vim.fn.join(texts, self.column_separator)
 end
 
+--- @class HighlightDef
+--- @field hl string
+--- @field col_start number
+--- @field col_end number
+
+--- @return HighlightDef[]
+function LineBuilder:get_hl()
+    --- @type HighlightDef[]
+    local defs = {}
+    local col = 0
+
+    for _, component in ipairs(self.components) do
+        local next_col = col + #component.text
+
+        if component.hl ~= nil then
+            table.insert(defs, {
+                hl = component.hl,
+                col_start = col,
+                col_end = next_col,
+            })
+        end
+        col = next_col + #self.column_separator
+    end
+
+    return defs
+end
+
 --- @param buf_id number
 --- @param line_index number zero based line index
 --- @param ns number

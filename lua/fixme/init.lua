@@ -1,6 +1,6 @@
-local LineBuilder = require("fixme.line_builder")
-local Converter = require("fixme.converter")
 local Config = require("fixme.config")
+local Converter = require("fixme.converter")
+local Manager = require("fixme.manager")
 
 local line_hl_ns = vim.api.nvim_create_namespace("fixme_qf")
 
@@ -20,36 +20,13 @@ function M.format(params)
 
     vim.api.nvim_buf_clear_namespace(result.qfbufnr, line_hl_ns, 0, -1)
 
-    local items = Converter.convert_items(result.items)
+    local manager = Manager:new(M.config)
+    manager:set_items(Converter.convert_items(result.items))
 
-    --- @type LineBuilder[]
-    local line_builders = {}
-    for _, item in ipairs(items) do
-        local line_builder = LineBuilder:new({
-            column_separator = M.config.column_separator,
-        })
-
-        for _, provider in ipairs(M.config.providers) do
-            line_builder:add(provider(item))
-        end
-
-        table.insert(line_builders, line_builder)
-    end
-
-    for _, hook in ipairs(M.config.hooks) do
-        hook(line_builders)
-    end
-
-    --- @type string[]
-    local lines = {}
-    for _, line_builder in ipairs(line_builders) do
-        table.insert(lines, line_builder:to_string())
-    end
+    local lines = manager:get_lines()
 
     vim.schedule(function()
-        for i, line_builder in ipairs(line_builders) do
-            line_builder:apply_highlights(result.qfbufnr, i - 1, line_hl_ns)
-        end
+        manager:apply_highlights(result.qfbufnr)
     end)
 
     return lines
