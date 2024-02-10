@@ -2,7 +2,7 @@ local LineBuilder = require("fixme.line_builder")
 
 --- @class Manager
 --- @field config Config
---- @field providers FixmeComponentProvider[]
+--- @field selector? FixmeSelector
 --- @field line_builders LineBuilder[]
 local Manager = {}
 
@@ -12,7 +12,7 @@ function Manager:new(config)
     --- @type Manager
     local this = {
         config = config,
-        providers = {},
+        selector = nil,
         line_builders = {},
     }
     setmetatable(this, self)
@@ -23,16 +23,16 @@ end
 
 --- @param qf_id number
 --- @return boolean
-function Manager:init_providers(qf_id)
+function Manager:init_selector(qf_id)
     for _, selector in ipairs(self.config.selectors) do
         if selector.use == nil then
-            self.providers = selector.providers
+            self.selector = selector
             return true
         end
 
         local ok, should_use = pcall(selector.use, qf_id)
         if ok and should_use then
-            self.providers = selector.providers
+            self.selector = selector
             return true
         end
     end
@@ -42,7 +42,7 @@ end
 
 --- @param items FixmeQFItem[]
 function Manager:set_items(items)
-    if #self.providers == 0 then
+    if self.selector == nil then
         return
     end
 
@@ -54,7 +54,7 @@ function Manager:set_items(items)
             column_separator = self.config.column_separator,
         })
 
-        for _, provider in ipairs(self.providers) do
+        for _, provider in ipairs(self.selector.providers) do
             line_builder:add(provider(item))
         end
 
@@ -62,10 +62,17 @@ function Manager:set_items(items)
     end
 
     self.line_builders = line_builders
+
+    self:_apply_hooks()
 end
 
---- @param hooks FixmeHook[]
-function Manager:apply_hooks(hooks)
+function Manager:_apply_hooks()
+    if self.selector == nil then
+        return
+    end
+
+    local hooks = self.selector.hooks or {}
+
     for _, hook in ipairs(hooks) do
         hook(self.line_builders)
     end

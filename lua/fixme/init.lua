@@ -17,12 +17,11 @@ function M.format(params)
     })
 
     local manager = Manager:new(M.config)
-    if not manager:init_providers(params.id) then
+    if not manager:init_selector(params.id) then
         return {}
     end
 
     manager:set_items(Converter.convert_items(result.items))
-    manager:apply_hooks(M.config.hooks)
 
     local lines = manager:format()
 

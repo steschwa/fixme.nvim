@@ -1,9 +1,5 @@
 --- @meta
 
---- @class FixmeSelector
---- @field use? fun(qf_id: number): boolean
---- @field providers FixmeComponentProvider[]
-
 --- @class FixmeComponent
 --- @field text string
 --- @field hl string?
@@ -21,6 +17,11 @@
 --- @field bufnr number
 
 --- @alias FixmeHook fun(line_builders: LineBuilder[])
+
+--- @class FixmeSelector
+--- @field providers FixmeComponentProvider[]
+--- @field use? fun(qf_id: number): boolean
+--- @field hooks? FixmeHook[]
 
 --- @class QFFormatParams
 --- @field id number
