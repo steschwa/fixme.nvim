@@ -50,9 +50,7 @@ function Manager:set_items(items)
     local line_builders = {}
 
     for _, item in ipairs(items) do
-        local line_builder = LineBuilder:new({
-            column_separator = self.config.column_separator,
-        })
+        local line_builder = LineBuilder:new()
 
         for _, provider in ipairs(self.selector.providers) do
             line_builder:add(provider(item))
