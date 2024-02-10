@@ -2,8 +2,6 @@ local Config = require("fixme.config")
 local Converter = require("fixme.converter")
 local Manager = require("fixme.manager")
 
-local line_hl_ns = vim.api.nvim_create_namespace("fixme_qf")
-
 --- @class FixmeImpl
 --- @field config Config
 local M = {}
@@ -18,12 +16,15 @@ function M.format(params)
         qfbufnr = true,
     })
 
-    vim.api.nvim_buf_clear_namespace(result.qfbufnr, line_hl_ns, 0, -1)
-
     local manager = Manager:new(M.config)
-    manager:set_items(Converter.convert_items(result.items))
+    if not manager:init_providers(params.id) then
+        return {}
+    end
 
-    local lines = manager:get_lines()
+    manager:set_items(Converter.convert_items(result.items))
+    manager:apply_hooks(M.config.hooks)
+
+    local lines = manager:format()
 
     vim.schedule(function()
         manager:apply_highlights(result.qfbufnr)
