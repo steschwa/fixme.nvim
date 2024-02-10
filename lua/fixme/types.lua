@@ -1,8 +1,5 @@
 --- @meta
 
---- @class FixmeOptions
---- @field providers FixmeComponentProvider[]
-
 --- @class FixmeComponent
 --- @field text string
 --- @field hl string?
