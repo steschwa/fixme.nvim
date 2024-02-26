@@ -16,12 +16,12 @@
 --- @field filepath string
 --- @field bufnr number
 
---- @alias FixmeHook fun(line_builders: LineBuilder[])
+--- @alias FixmeLayoutFn fun(lines: LineBuilder[])
 
 --- @class FixmeSelector
 --- @field providers FixmeComponentProvider[]
 --- @field use? fun(qf_id: number): boolean
---- @field hooks? FixmeHook[]
+--- @field layout? FixmeLayoutFn
 
 --- @class QFFormatParams
 --- @field id number

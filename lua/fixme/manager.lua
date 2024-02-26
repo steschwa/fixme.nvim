@@ -61,19 +61,18 @@ function Manager:set_items(items)
 
     self.line_builders = line_builders
 
-    self:_apply_hooks()
+    self:_apply_layout()
 end
 
-function Manager:_apply_hooks()
+function Manager:_apply_layout()
     if self.selector == nil then
         return
     end
-
-    local hooks = self.selector.hooks or {}
-
-    for _, hook in ipairs(hooks) do
-        hook(self.line_builders)
+    if self.selector.layout == nil then
+        return
     end
+
+    self.selector.layout(self.line_builders)
 end
 
 --- @return string[]

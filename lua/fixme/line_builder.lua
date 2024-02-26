@@ -15,10 +15,13 @@ function LineBuilder:new()
 end
 
 --- @param component FixmeComponent
---- @return LineBuilder
-function LineBuilder:add(component)
-    table.insert(self.components, component)
-    return self
+--- @param pos? number
+function LineBuilder:add(component, pos)
+    if pos ~= nil then
+        table.insert(self.components, pos, component)
+    else
+        table.insert(self.components, component)
+    end
 end
 
 --- @return string
@@ -57,6 +60,12 @@ function LineBuilder:get_hl()
     end
 
     return defs
+end
+
+--- @param index number
+--- @return FixmeComponent
+function LineBuilder:at(index)
+    return self.components[index]
 end
 
 return LineBuilder
