@@ -1,16 +1,19 @@
---- @class Config
---- @field selectors FixmeSelector[]
+--- @class fixme.Config
 local Config = {}
 
---- @class CreateConfigParams
---- @field selectors? FixmeSelector[]
+--- @class fixme.CreateConfigParams
+--- @field selectors? fixme.Selector[]
+--- @field column_separator? string
+--- @field cell_separator? string
 
---- @param params CreateConfigParams
---- @return Config
+--- @param params fixme.CreateConfigParams
+--- @return fixme.Config
 function Config:create(params)
-    --- @type Config
+    --- @type fixme.Config
     local this = {
         selectors = params.selectors or {},
+        column_separator = params.column_separator or " ",
+        cell_separator = params.cell_separator or " ",
     }
     setmetatable(this, self)
     self.__index = self

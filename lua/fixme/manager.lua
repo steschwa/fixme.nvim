@@ -1,15 +1,15 @@
 local LineBuilder = require("fixme.line_builder")
 
---- @class Manager
---- @field config Config
---- @field selector? FixmeSelector
---- @field line_builders LineBuilder[]
+--- @class fixme.Manager
+--- @field config fixme.Config
+--- @field selector? fixme.Selector
+--- @field line_builders fixme.LineBuilder[]
 local Manager = {}
 
---- @param config Config
---- @return Manager
+--- @param config fixme.Config
+--- @return fixme.Manager
 function Manager:new(config)
-    --- @type Manager
+    --- @type fixme.Manager
     local this = {
         config = config,
         selector = nil,
@@ -40,39 +40,45 @@ function Manager:init_selector(qf_id)
     return false
 end
 
---- @param items FixmeQFItem[]
+--- @param items fixme.QuickfixItem[]
 function Manager:set_items(items)
     if self.selector == nil then
         return
     end
 
-    --- @type LineBuilder[]
+    --- @type fixme.LineBuilder[]
     local line_builders = {}
 
-    for _, item in ipairs(items) do
-        local line_builder = LineBuilder:new()
+    --- @type number[]
+    local column_widths = {}
 
-        for _, provider in ipairs(self.selector.providers) do
-            line_builder:add(provider(item))
+    for _, item in ipairs(items) do
+        local line_builder =
+            LineBuilder:new(self.config.cell_separator, self.config.column_separator)
+
+        for i, column in ipairs(self.selector.columns) do
+            --- @type fixme.FormatResult[]
+            local column_res = {}
+
+            for _, cell_formatter in ipairs(column) do
+                table.insert(column_res, cell_formatter(item))
+            end
+
+            local column_width = line_builder:add(column_res)
+
+            column_widths[i] = math.max(column_widths[i] or 0, column_width)
         end
 
         table.insert(line_builders, line_builder)
     end
 
+    for _, line_builder in ipairs(line_builders) do
+        for i, column_width in ipairs(column_widths) do
+            line_builder:apply_column_width(i, column_width)
+        end
+    end
+
     self.line_builders = line_builders
-
-    self:_apply_layout()
-end
-
-function Manager:_apply_layout()
-    if self.selector == nil then
-        return
-    end
-    if self.selector.layout == nil then
-        return
-    end
-
-    self.selector.layout(self.line_builders)
 end
 
 --- @return string[]
@@ -98,7 +104,7 @@ function Manager:apply_highlights(buf_id)
 
     for i, line_builder in ipairs(self.line_builders) do
         local line_index = i - 1
-        local defs = line_builder:get_hl()
+        local defs = line_builder:get_highlights()
         for _, def in ipairs(defs) do
             vim.highlight.range(
                 buf_id,

@@ -1,15 +1,21 @@
 local Config = require("fixme.config")
-local Converter = require("fixme.converter")
 local Manager = require("fixme.manager")
 
---- @class FixmeImpl
---- @field config Config
+--- @class fixme.Impl
+--- @field config fixme.Config
 local M = {}
 
---- @param params QFFormatParams
+--- @class fixme.FormatParams
+--- @field id number
+
+--- @class fixme.GetQuickfixResult
+--- @field qfbufnr number
+--- @field items fixme.QuickfixItem[]
+
+--- @param params fixme.FormatParams
 --- @return string[]
 function M.format(params)
-    --- @type GetQFResult
+    --- @type fixme.GetQuickfixResult
     local result = vim.fn.getqflist({
         id = params.id,
         items = true,
@@ -21,7 +27,7 @@ function M.format(params)
         return {}
     end
 
-    manager:set_items(Converter.convert_items(result.items))
+    manager:set_items(result.items)
 
     local lines = manager:format()
 
@@ -32,21 +38,28 @@ function M.format(params)
     return lines
 end
 
---- @param params CreateConfigParams
+--- @param qf_id number
+--- @return fixme.Selector | nil
+function M.find_selector(qf_id)
+    for _, selector in ipairs(M.config.selectors) do
+        if selector.use == nil then
+            return selector
+        end
+
+        local ok, should_use = pcall(selector.use, qf_id)
+        if ok and should_use then
+            return selector
+        end
+    end
+end
+
+--- @param params fixme.CreateConfigParams
 function M.setup(params)
     local config = Config:create(params)
 
     M.config = config
 
     vim.o.quickfixtextfunc = "v:lua.require'fixme'.format"
-
-    vim.api.nvim_create_autocmd("FileType", {
-        group = vim.api.nvim_create_augroup("reset_syntax_qf", {
-            clear = true,
-        }),
-        pattern = { "qf" },
-        command = "syntax clear",
-    })
 end
 
 return M

@@ -1,32 +1,21 @@
---- @meta
+--- @class fixme.Config
+--- @field selectors fixme.Selector[]
+--- @field column_separator string
+--- @field cell_separator string
 
---- @class FixmeComponent
+--- @class fixme.Selector
+--- @field columns fixme.Column[]
+--- @field use? fun(qf_id: number): boolean
+
+--- @alias fixme.Column fixme.CellFormatter[]
+
+--- @alias fixme.CellFormatter fun(qf_item): fixme.FormatResult
+
+--- @class fixme.FormatResult
 --- @field text string
 --- @field hl string?
 
---- @alias FixmeComponentProvider fun(item: FixmeQFItem): FixmeComponent
-
---- @class FixmeQFItem
---- @field line_start number
---- @field line_end number
---- @field col_start number
---- @field col_end number
---- @field type string
---- @field text string
---- @field filepath string
---- @field bufnr number
-
---- @alias FixmeLayoutFn fun(lines: LineBuilder[])
-
---- @class FixmeSelector
---- @field providers FixmeComponentProvider[]
---- @field use? fun(qf_id: number): boolean
---- @field layout? FixmeLayoutFn
-
---- @class QFFormatParams
---- @field id number
-
---- @class QFItem
+--- @class fixme.QuickfixItem
 --- @field bufnr number
 --- @field lnum number
 --- @field end_lnum number
@@ -35,7 +24,3 @@
 --- @field text string
 --- @field type string
 --- @field valid number
-
---- @class GetQFResult
---- @field qfbufnr number
---- @field items QFItem[]
