@@ -38,21 +38,6 @@ function M.format(params)
     return lines
 end
 
---- @param qf_id number
---- @return fixme.Selector | nil
-function M.find_selector(qf_id)
-    for _, selector in ipairs(M.config.selectors) do
-        if selector.use == nil then
-            return selector
-        end
-
-        local ok, should_use = pcall(selector.use, qf_id)
-        if ok and should_use then
-            return selector
-        end
-    end
-end
-
 --- @param params fixme.CreateConfigParams
 function M.setup(params)
     local config = Config:create(params)
