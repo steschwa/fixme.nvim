@@ -91,14 +91,15 @@ function Formatter:format_lines()
     return lines
 end
 
+local NS = vim.api.nvim_create_namespace("fixme_qf")
+
 ---@param buf_id number
 function Formatter:apply_highlights(buf_id)
     if not vim.api.nvim_buf_is_valid(buf_id) then
         return
     end
 
-    local namespace = vim.api.nvim_create_namespace("fixme_qf")
-    vim.api.nvim_buf_clear_namespace(buf_id, namespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(buf_id, NS, 0, -1)
 
     for i, line_builder in ipairs(self.line_builders) do
         local line_index = i - 1
@@ -106,7 +107,7 @@ function Formatter:apply_highlights(buf_id)
         for _, def in ipairs(defs) do
             vim.highlight.range(
                 buf_id,
-                namespace,
+                NS,
                 def.hl,
                 { line_index, def.col_start },
                 { line_index, def.col_end }

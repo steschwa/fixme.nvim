@@ -1,4 +1,4 @@
-local Formatter = require("lua.fixme.formatter")
+local Formatter = require("fixme.formatter")
 
 ---@class fixme.Instance
 ---@field config fixme.Config
@@ -28,13 +28,11 @@ function M.format(params)
 
     formatter:set_items(result.items)
 
-    local lines = formatter:format_lines()
-
     vim.schedule(function()
         formatter:apply_highlights(result.qfbufnr)
     end)
 
-    return lines
+    return formatter:format_lines()
 end
 
 ---@param opts fixme.Config
