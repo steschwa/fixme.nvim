@@ -14,9 +14,10 @@ function Formatter:new(config)
         selector = nil,
         line_builders = {},
     }
-    setmetatable(this, { __index = self })
 
-    return this
+    return setmetatable(this, {
+        __index = self,
+    })
 end
 
 ---@param qf_id number

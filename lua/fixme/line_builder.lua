@@ -12,17 +12,16 @@ local LineBuilder = {}
 ---@param column_separator string
 ---@return fixme.LineBuilder
 function LineBuilder:new(cell_separator, column_separator)
-    ---@type fixme.LineBuilder
     local this = {
         cell_separator = cell_separator,
         column_separator = column_separator,
         columns = {},
         column_widths = {},
     }
-    setmetatable(this, self)
-    self.__index = self
 
-    return this
+    return setmetatable(this, {
+        __index = self,
+    })
 end
 
 ---@param column fixme.FormatResult[]
