@@ -1,15 +1,15 @@
 local LineBuilder = require("fixme.line_builder")
 
---- @class fixme.Manager
---- @field config fixme.Config
---- @field selector? fixme.Selector
---- @field line_builders fixme.LineBuilder[]
+---@class fixme.Manager
+---@field config fixme.Config
+---@field selector? fixme.Selector
+---@field line_builders fixme.LineBuilder[]
 local Manager = {}
 
---- @param config fixme.Config
---- @return fixme.Manager
+---@param config fixme.Config
+---@return fixme.Manager
 function Manager:new(config)
-    --- @type fixme.Manager
+    ---@type fixme.Manager
     local this = {
         config = config,
         selector = nil,
@@ -21,8 +21,8 @@ function Manager:new(config)
     return this
 end
 
---- @param qf_id number
---- @return boolean
+---@param qf_id number
+---@return boolean
 function Manager:init_selector(qf_id)
     for _, selector in ipairs(self.config.selectors) do
         if selector.use == nil then
@@ -40,16 +40,16 @@ function Manager:init_selector(qf_id)
     return false
 end
 
---- @param items fixme.QuickfixItem[]
+---@param items fixme.QuickfixItem[]
 function Manager:set_items(items)
     if self.selector == nil then
         return
     end
 
-    --- @type fixme.LineBuilder[]
+    ---@type fixme.LineBuilder[]
     local line_builders = {}
 
-    --- @type number[]
+    ---@type number[]
     local column_widths = {}
 
     for _, item in ipairs(items) do
@@ -57,7 +57,7 @@ function Manager:set_items(items)
             LineBuilder:new(self.config.cell_separator, self.config.column_separator)
 
         for i, column in ipairs(self.selector.columns) do
-            --- @type fixme.FormatResult[]
+            ---@type fixme.FormatResult[]
             local column_res = {}
 
             for _, cell_formatter in ipairs(column) do
@@ -81,9 +81,9 @@ function Manager:set_items(items)
     self.line_builders = line_builders
 end
 
---- @return string[]
+---@return string[]
 function Manager:format()
-    --- @type string[]
+    ---@type string[]
     local lines = {}
 
     for _, line_builder in ipairs(self.line_builders) do
@@ -93,7 +93,7 @@ function Manager:format()
     return lines
 end
 
---- @param buf_id number
+---@param buf_id number
 function Manager:apply_highlights(buf_id)
     if not vim.api.nvim_buf_is_valid(buf_id) then
         return

@@ -1,21 +1,21 @@
 local Config = require("fixme.config")
 local Manager = require("fixme.manager")
 
---- @class fixme.Impl
---- @field config fixme.Config
+---@class fixme.Impl
+---@field config fixme.Config
 local M = {}
 
---- @class fixme.FormatParams
---- @field id number
+---@class fixme.FormatParams
+---@field id number
 
---- @class fixme.GetQuickfixResult
---- @field qfbufnr number
---- @field items fixme.QuickfixItem[]
+---@class fixme.GetQuickfixResult
+---@field qfbufnr number
+---@field items fixme.QuickfixItem[]
 
---- @param params fixme.FormatParams
---- @return string[]
+---@param params fixme.FormatParams
+---@return string[]
 function M.format(params)
-    --- @type fixme.GetQuickfixResult
+    ---@type fixme.GetQuickfixResult
     local result = vim.fn.getqflist({
         id = params.id,
         items = true,
@@ -38,11 +38,9 @@ function M.format(params)
     return lines
 end
 
---- @param params fixme.CreateConfigParams
+---@param params fixme.CreateConfigParams
 function M.setup(params)
-    local config = Config:create(params)
-
-    M.config = config
+    M.config = Config.create(params)
 
     vim.o.quickfixtextfunc = "v:lua.require'fixme'.format"
 end

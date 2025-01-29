@@ -1,18 +1,18 @@
 local CELL_SEPARATOR_HL = "FixmeCellSeparator"
 local COLUMN_SEPARATOR_HL = "FixmeColumnSeparator"
 
---- @class fixme.LineBuilder
---- @field cell_separator string
---- @field column_separator string
---- @field columns fixme.FormatResult[][]
---- @field column_widths number[] width of the columns in `LineBuilder.columns`. we store it as a variable to be independent of spacers that may get inserted with `LineBuilder.apply_column_width`
+---@class fixme.LineBuilder
+---@field cell_separator string
+---@field column_separator string
+---@field columns fixme.FormatResult[][]
+---@field column_widths number[] width of the columns in `LineBuilder.columns`. we store it as a variable to be independent of spacers that may get inserted with `LineBuilder.apply_column_width`
 local LineBuilder = {}
 
---- @param cell_separator string
---- @param column_separator string
---- @return fixme.LineBuilder
+---@param cell_separator string
+---@param column_separator string
+---@return fixme.LineBuilder
 function LineBuilder:new(cell_separator, column_separator)
-    --- @type fixme.LineBuilder
+    ---@type fixme.LineBuilder
     local this = {
         cell_separator = cell_separator,
         column_separator = column_separator,
@@ -25,8 +25,8 @@ function LineBuilder:new(cell_separator, column_separator)
     return this
 end
 
---- @param column fixme.FormatResult[]
---- @return number column width
+---@param column fixme.FormatResult[]
+---@return number column width
 function LineBuilder:add(column)
     table.insert(self.columns, column)
 
@@ -40,8 +40,8 @@ function LineBuilder:add(column)
     return width
 end
 
---- @param column_idx number (1-based)
---- @param column_width number
+---@param column_idx number (1-based)
+---@param column_width number
 function LineBuilder:apply_column_width(column_idx, column_width)
     if column_idx > #self.column_widths then
         return
@@ -58,9 +58,9 @@ function LineBuilder:apply_column_width(column_idx, column_width)
     self.columns[column_idx][last_cell_index].text = original_text .. string.rep(" ", spacer_width)
 end
 
---- @return fixme.FormatResult[]
+---@return fixme.FormatResult[]
 function LineBuilder:flatten()
-    --- @type fixme.FormatResult[]
+    ---@type fixme.FormatResult[]
     local out = {}
 
     for i, column in ipairs(self.columns) do
@@ -68,7 +68,7 @@ function LineBuilder:flatten()
             table.insert(out, res)
 
             if j >= 1 and j < #column then
-                --- @type fixme.FormatResult
+                ---@type fixme.FormatResult
                 local separator = {
                     text = self.cell_separator,
                     hl = CELL_SEPARATOR_HL,
@@ -78,7 +78,7 @@ function LineBuilder:flatten()
         end
 
         if i >= 1 and i < #self.columns then
-            --- @type fixme.FormatResult
+            ---@type fixme.FormatResult
             local separator = {
                 text = self.column_separator,
                 hl = COLUMN_SEPARATOR_HL,
@@ -90,14 +90,14 @@ function LineBuilder:flatten()
     return out
 end
 
---- @class fixme.HighlightDef
---- @field hl string
---- @field col_start number
---- @field col_end number
+---@class fixme.HighlightDef
+---@field hl string
+---@field col_start number
+---@field col_end number
 
---- @return fixme.HighlightDef[]
+---@return fixme.HighlightDef[]
 function LineBuilder:get_highlights()
-    --- @type fixme.HighlightDef[]
+    ---@type fixme.HighlightDef[]
     local hl = {}
     local col = 0
 
@@ -108,7 +108,7 @@ function LineBuilder:get_highlights()
         col = col_end
 
         if res.hl ~= nil then
-            --- @type fixme.HighlightDef
+            ---@type fixme.HighlightDef
             local def = {
                 hl = res.hl,
                 col_start = col_start,
@@ -121,7 +121,7 @@ function LineBuilder:get_highlights()
     return hl
 end
 
---- @return string
+---@return string
 function LineBuilder:to_string()
     local text = ""
 
