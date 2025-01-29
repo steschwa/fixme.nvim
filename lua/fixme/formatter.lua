@@ -1,29 +1,27 @@
 local LineBuilder = require("fixme.line_builder")
 
----@class fixme.Manager
+---@class fixme.Formatter
 ---@field config fixme.Config
 ---@field selector? fixme.Selector
 ---@field line_builders fixme.LineBuilder[]
-local Manager = {}
+local Formatter = {}
 
 ---@param config fixme.Config
----@return fixme.Manager
-function Manager:new(config)
-    ---@type fixme.Manager
+---@return fixme.Formatter
+function Formatter:new(config)
     local this = {
         config = config,
         selector = nil,
         line_builders = {},
     }
-    setmetatable(this, self)
-    self.__index = self
+    setmetatable(this, { __index = self })
 
     return this
 end
 
 ---@param qf_id number
 ---@return boolean
-function Manager:init_selector(qf_id)
+function Formatter:init_selector(qf_id)
     for _, selector in ipairs(self.config.selectors) do
         if selector.use == nil then
             self.selector = selector
@@ -41,7 +39,7 @@ function Manager:init_selector(qf_id)
 end
 
 ---@param items fixme.QuickfixItem[]
-function Manager:set_items(items)
+function Formatter:set_items(items)
     if self.selector == nil then
         return
     end
@@ -82,7 +80,7 @@ function Manager:set_items(items)
 end
 
 ---@return string[]
-function Manager:format()
+function Formatter:format_lines()
     ---@type string[]
     local lines = {}
 
@@ -94,7 +92,7 @@ function Manager:format()
 end
 
 ---@param buf_id number
-function Manager:apply_highlights(buf_id)
+function Formatter:apply_highlights(buf_id)
     if not vim.api.nvim_buf_is_valid(buf_id) then
         return
     end
@@ -117,4 +115,4 @@ function Manager:apply_highlights(buf_id)
     end
 end
 
-return Manager
+return Formatter

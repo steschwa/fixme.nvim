@@ -1,7 +1,6 @@
-local Config = require("fixme.config")
-local Manager = require("fixme.manager")
+local Formatter = require("lua.fixme.formatter")
 
----@class fixme.Impl
+---@class fixme.Instance
 ---@field config fixme.Config
 local M = {}
 
@@ -22,25 +21,25 @@ function M.format(params)
         qfbufnr = true,
     })
 
-    local manager = Manager:new(M.config)
-    if not manager:init_selector(params.id) then
+    local formatter = Formatter:new(M.config)
+    if not formatter:init_selector(params.id) then
         return {}
     end
 
-    manager:set_items(result.items)
+    formatter:set_items(result.items)
 
-    local lines = manager:format()
+    local lines = formatter:format_lines()
 
     vim.schedule(function()
-        manager:apply_highlights(result.qfbufnr)
+        formatter:apply_highlights(result.qfbufnr)
     end)
 
     return lines
 end
 
----@param params fixme.CreateConfigParams
-function M.setup(params)
-    M.config = Config.create(params)
+---@param opts fixme.Config
+function M.setup(opts)
+    M.config = opts
 
     vim.o.quickfixtextfunc = "v:lua.require'fixme'.format"
 end
