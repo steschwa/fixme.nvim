@@ -26,12 +26,12 @@ end
 
 ---@param column fixme.FormatResult[]
 ---@return number column width
-function LineBuilder:add(column)
+function LineBuilder:set(column)
     table.insert(self.columns, column)
 
     local width = 0
     for _, res in ipairs(column) do
-        width = width + #res.text
+        width = width + vim.api.nvim_strwidth(res.text)
     end
 
     table.insert(self.column_widths, width)
@@ -91,8 +91,8 @@ end
 
 ---@class fixme.HighlightDef
 ---@field hl string
----@field col_start number
----@field col_end number
+---@field col_start number (0-based, bytes)
+---@field col_end number (0-based, bytes)
 
 ---@return fixme.HighlightDef[]
 function LineBuilder:get_highlights()
@@ -102,7 +102,9 @@ function LineBuilder:get_highlights()
 
     for _, res in ipairs(self:flatten()) do
         local col_start = col
-        local col_end = col_start + #res.text
+
+        -- NOTE: `string.len(res.text)` (or #res.text) calculates the string width in bytes
+        local col_end = col_start + string.len(res.text)
 
         col = col_end
 

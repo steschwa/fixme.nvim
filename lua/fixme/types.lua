@@ -1,14 +1,11 @@
 ---@class fixme.Config
----@field selectors fixme.Selector[]
+---@field columns fixme.ColumnsFn
 ---@field column_separator string
 ---@field cell_separator string
 
----@class fixme.Selector
----@field columns fixme.Column[]
----@field use? fun(qf_id: number): boolean
+---@alias fixme.ColumnsFn fun(qf_id: number): fixme.Column[]
 
 ---@alias fixme.Column fixme.CellFormatter[]
-
 ---@alias fixme.CellFormatter fun(qf_item: fixme.QuickfixItem): fixme.FormatResult
 
 ---@class fixme.FormatResult

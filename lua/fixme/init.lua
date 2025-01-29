@@ -21,12 +21,12 @@ function M.format(params)
         qfbufnr = true,
     })
 
-    local formatter = Formatter:new(M.config)
-    if not formatter:init_selector(params.id) then
-        return {}
-    end
-
-    formatter:set_items(result.items)
+    local formatter = Formatter:create({
+        columns = M.config.columns(params.id),
+        items = result.items,
+        cell_separator = M.config.cell_separator,
+        column_separator = M.config.column_separator,
+    })
 
     vim.schedule(function()
         formatter:apply_highlights(result.qfbufnr)

@@ -1,61 +1,24 @@
 local LineBuilder = require("fixme.line_builder")
 
----@class fixme.Formatter
----@field config fixme.Config
----@field selector? fixme.Selector
----@field line_builders fixme.LineBuilder[]
-local Formatter = {}
+---@class fixme.CreateLineBuildersParams
+---@field columns fixme.Column[]
+---@field items fixme.QuickfixItem[]
+---@field column_separator string
+---@field cell_separator string
 
----@param config fixme.Config
----@return fixme.Formatter
-function Formatter:new(config)
-    local this = {
-        config = config,
-        selector = nil,
-        line_builders = {},
-    }
-
-    return setmetatable(this, {
-        __index = self,
-    })
-end
-
----@param qf_id number
----@return boolean
-function Formatter:init_selector(qf_id)
-    for _, selector in ipairs(self.config.selectors) do
-        if selector.use == nil then
-            self.selector = selector
-            return true
-        end
-
-        local ok, should_use = pcall(selector.use, qf_id)
-        if ok and should_use then
-            self.selector = selector
-            return true
-        end
-    end
-
-    return false
-end
-
----@param items fixme.QuickfixItem[]
-function Formatter:set_items(items)
-    if self.selector == nil then
-        return
-    end
-
+---@param params fixme.CreateLineBuildersParams
+---@return fixme.LineBuilder[]
+local function create_line_builders(params)
     ---@type fixme.LineBuilder[]
     local line_builders = {}
 
     ---@type number[]
     local column_widths = {}
 
-    for _, item in ipairs(items) do
-        local line_builder =
-            LineBuilder:new(self.config.cell_separator, self.config.column_separator)
+    for _, item in ipairs(params.items) do
+        local line_builder = LineBuilder:new(params.cell_separator, params.column_separator)
 
-        for i, column in ipairs(self.selector.columns) do
+        for i, column in ipairs(params.columns) do
             ---@type fixme.FormatResult[]
             local column_res = {}
 
@@ -63,7 +26,7 @@ function Formatter:set_items(items)
                 table.insert(column_res, cell_formatter(item))
             end
 
-            local column_width = line_builder:add(column_res)
+            local column_width = line_builder:set(column_res)
 
             column_widths[i] = math.max(column_widths[i] or 0, column_width)
         end
@@ -77,7 +40,36 @@ function Formatter:set_items(items)
         end
     end
 
-    self.line_builders = line_builders
+    return line_builders
+end
+
+---@class fixme.Formatter
+---@field line_builders fixme.LineBuilder[]
+local Formatter = {}
+
+---@class fixme.CreateFormatterParams
+---@field columns fixme.Column[]
+---@field items fixme.QuickfixItem[]
+---@field column_separator string
+---@field cell_separator string
+
+---@param params fixme.CreateFormatterParams
+---@return fixme.Formatter
+function Formatter:create(params)
+    local line_builders = create_line_builders({
+        columns = params.columns,
+        items = params.items,
+        cell_separator = params.cell_separator,
+        column_separator = params.column_separator,
+    })
+
+    local this = {
+        line_builders = line_builders,
+    }
+
+    return setmetatable(this, {
+        __index = self,
+    })
 end
 
 ---@return string[]
@@ -105,6 +97,7 @@ function Formatter:apply_highlights(buf_id)
     for i, line_builder in ipairs(self.line_builders) do
         local line_index = i - 1
         local defs = line_builder:get_highlights()
+
         for _, def in ipairs(defs) do
             vim.highlight.range(
                 buf_id,

@@ -1,1 +1,1 @@
-syntax clear
+syntax off
