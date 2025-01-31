@@ -27,7 +27,7 @@ return {
 ## Configuration
 
 The plugin allows for extensive customization of how each quickfix item is displayed.
-You can define your own provider functions that dictate what information to show and how to format it.
+See [Item Formatting](#item-formatting) for a description and [Example Configuration](#example-configuration) for a hands-on example.
 
 <details>
 <summary>Types</summary>
@@ -69,6 +69,18 @@ These values are used by default if not overridden by you.
 ```
 
 </details>
+
+### Item Formatting
+
+The primary configuration option is the `columns` field, which is a function of type `fixme.ColumnsFn`.
+This function is invoked with the quickfix list ID (a number) and is responsible for determining which formatting columns and cell formatters to use based on the context of the quickfix list.
+The `columns` function should return a table of columns, where each column is itself a table containing one or more cell formatters.
+Each cell formatter is a function that accepts a parameter of type `fixme.QuickfixItem` and is expected to return a `fixme.FormatResult`.
+
+The `fixme.FormatResult` is a table with the following keys:
+
+- `text` (string): The text to be displayed in the quickfix item.
+- `hl` (string, optional): The highlight group to be applied to the text. If not specified, the default highlight will be used.
 
 ### Example Configuration
 
