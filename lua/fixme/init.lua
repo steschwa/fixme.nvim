@@ -1,5 +1,22 @@
 local Formatter = require("fixme.formatter")
 
+---@param opts fixme.Config
+---@return fixme.Config
+local function create_config(opts)
+    opts = opts or {}
+
+    ---@type fixme.Config
+    local config = {
+        cell_separator = opts.cell_separator or " ",
+        column_separator = opts.column_separator or "|",
+        columns = opts.columns or function()
+            return {}
+        end,
+    }
+
+    return config
+end
+
 ---@class fixme.Instance
 ---@field config fixme.Config
 local M = {}
@@ -37,7 +54,7 @@ end
 
 ---@param opts fixme.Config
 function M.setup(opts)
-    M.config = opts
+    M.config = create_config(opts)
 
     vim.o.quickfixtextfunc = "v:lua.require'fixme'.format"
 end
