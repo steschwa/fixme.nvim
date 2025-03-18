@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2025-03-18
+
+### 🐛 Bug Fixes
+
+- Prefix tags with v
+
 ## [0.1.2] - 2025-03-18
 
 ### 🐛 Bug Fixes
